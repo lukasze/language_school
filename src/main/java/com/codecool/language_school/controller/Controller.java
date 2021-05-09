@@ -33,63 +33,37 @@ public abstract class Controller {
         this.user = user;
     }
 
-    /**
-     * Loop in which program stays while user is logged in.
-     * It wraps the specific Controller class method calls
-     * with logic committing transaction to database.
-     *
-     * Gets EntityTransaction from EntityManager.
-     * Loop starts.
-     * Prints commands calling View.
-     * Gets input from user, with bound of commandsMap.size().
-     * Starts transaction.
-     * Calls commandsMap.get(userChoice).run().
-     * Commits transaction.
-     *
-     */
     public void run() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        EntityTransaction transaction = entityManager.getTransaction();
+        while (loggedIn) {
+            view.printCommands();
+            int userChoice = input.getIntInput("", commandsMap.size());
+            transaction.begin();
+            commandsMap.get(userChoice).run();
+            transaction.commit();
+        }
     }
 
     public void logOut() {
         this.loggedIn = false;
     }
 
-    protected void endExecution(String message) {
+    protected void                                                                                                            endExecution(String message) {
         input.getEmptyInput(message);
         view.clearScreen();
     }
 
-    /**
-     * Generic method retrieving Optional of single object from database by single parameter.
-     * Method uses String.format() and Query.setParameter() to create dynamic queries
-     *
-     * @param theClass class to receive from query
-     * @param tableName database table name
-     * @param parameter database column name to look by
-     * @param value database column value to look by
-     * @param <T> type to receive from query
-     * @param <V> type of parameter passed to query
-     * @return Optional of <T> by Stream findFirst() on result list
-     */
     protected <T, V> Optional<T> getOptional(Class<T> theClass, String tableName, String parameter, V value){
-        throw new UnsupportedOperationException("Not yet implemented");
+        String query = String.format("SELECT x from %s x WHERE x.%s = ?1", tableName, parameter);
+        return entityManager.createQuery(query, theClass).setParameter(1, value)
+                .getResultList().stream()
+                .findFirst();
     }
 
-    /**
-     * Generic method retrieving list of objects from database by single parameter.
-     * Method uses String.format() and Query.setParameter() to create dynamic queries
-     *
-     * @param theClass class to receive from query
-     * @param tableName database table name
-     * @param parameter database column name to look by
-     * @param value database column value to look by
-     * @param <T> type to receive from query
-     * @param <V> type of parameter passed to query
-     * @return Optional of <T> by Stream findFirst() on result list
-     */
     protected <T, V> List<T> getList(Class<T> theClass, String tableName, String parameter, V value){
-        throw new UnsupportedOperationException("Not yet implemented");
+        String query = String.format("SELECT x from %s x WHERE x.%s = ?1", tableName, parameter);
+        return entityManager.createQuery(query, theClass).setParameter(1, value)
+                .getResultList();
     }
 
     protected void deleteStudent() {
@@ -100,16 +74,16 @@ public abstract class Controller {
         deleteUser(Role.TEACHER);
     }
 
-    /**
-     * Method removing User of given role.
-     * It finds User by doubly parametrized query (Role and id)
-     * If User is found, removes it,
-     * otherwise inform that User of given Role and given id could not be found
-     *
-     * @param role user Role to remove by
-     */
     private void deleteUser(Role role) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        long id = input.getIntInput("Id: ");
+        Optional<User> optionalUser = entityManager.createQuery("SELECT u from AppUser u WHERE u.role = ?1 AND u.id = ?2", User.class)
+                .setParameter(1, role).setParameter(2, id).getResultList().stream().findFirst();
+        if (optionalUser.isPresent()){
+            entityManager.remove(optionalUser.get());
+            endExecution("Deleted "+ role.getName().toLowerCase() +". Press any key to continue");
+        } else {
+            endExecution("Could not find " + role.getName().toLowerCase() + " of given id. Press any key to continue");
+        }
     }
 
     protected void createStudent() {
@@ -120,39 +94,50 @@ public abstract class Controller {
         createUser(Role.TEACHER);
     }
 
-    /**
-     * Method creating user of given role and persisting the user and their credentials.
-     *
-     * Gets name, surname and age by calling Input methods.
-     * Gets credentials by Controller method.
-     * Persists credentials - if credentials which user relates to are not in database
-     * when user is to be persisted, an error will occur.
-     * Uses switch case on Role from parameter.
-     * For Role.Student gets Klass using Controller.getExisting() and creates Student.
-     * For Role.Teacher created Teacher and asks for amount of classes he has,
-     * in loop assigns the classes using Controller.getExisting().
-     * For Role.Admin creates Admin.
-     * Persists user.
-     * Ends execution with appropriate message.
-     *
-     * @param role User Role indicating type of user to create
-     */
     private void createUser(Role role) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        User user = null;
+        String name = input.getInput("Name: ");
+        String surname = input.getInput("Surname: ");
+        int age = input.getIntInput("Age: ", 100);
+        Credentials credentials = createCredentials();
+        entityManager.persist(credentials);
+        switch (role) {
+            case STUDENT:
+                Klass klass = getExisting("Klass", Klass.class);
+                user = new Student(name, surname, age, credentials, klass);
+                break;
+            case TEACHER:
+                user = new Teacher(name, surname, age, credentials);
+                int klassAmount = input.getIntInput("Number of classes the teacher has: ", 10);
+                for (int i = 0; i < klassAmount; i++) {
+                    ((Teacher) user).addClass(getExisting("Klass", Klass.class));
+                }
+                break;
+            case ADMIN:
+                user = new Admin(name, surname, age, credentials);
+        }
+        entityManager.persist(user);
+        endExecution("New " + role.getName().toLowerCase() +" created. Press any key to continue");
     }
 
-    /**
-     * Generic method retrieving object from database by id.
-     * Method uses String.format() and Query.setParameter() to create dynamic queries.
-     * Method keeps asking for id until Optional of <T> is present.
-     *
-     * @param dataType table name
-     * @param theClass class to receive from query
-     * @param <T> type to receive from query
-     * @return Object of type <T> by Stream findFirst() on result list
-     */
     protected <T> T getExisting(String dataType, Class<T> theClass) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        boolean exists = false;
+        T data = null;
+        String query = "SELECT x FROM " + dataType + " x WHERE x.id = ?1";
+        while (!exists) {
+            long id = input.getIntInput(dataType + " id: ");
+            Optional<T> optionalT = entityManager
+                    .createQuery(query, theClass)
+                    .setParameter(1, id).getResultList().stream().findFirst();
+            if (optionalT.isEmpty()) {
+                input.getEmptyInput(dataType + " with given id does not exist." +
+                        "Provide different id.");
+            } else {
+                exists = true;
+                data = optionalT.get();
+            }
+        }
+        return data;
     }
 
     protected Credentials createCredentials() {
@@ -162,16 +147,22 @@ public abstract class Controller {
         return new Credentials(email, login, password);
     }
 
-    /**
-     * Method generating unique Credentials email or login.
-     * Method uses String.format() and Query.setParameter() to create dynamic queries.
-     * Gets input from user and looks for Credentials in database with that value
-     * While Optional of Credentials is present, keeps asking for a value that will be unique
-     *
-     * @param credentialType login or email
-     * @return unique login or email - Credential component of type String
-     */
     private String createUnique(String credentialType) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        boolean validCredentials = false;
+        String userCredential = "";
+        String query = "SELECT c FROM Credentials c WHERE c." + credentialType.toLowerCase() + " = ?1";
+        while (!validCredentials) {
+            userCredential = input.getInput(credentialType + ": ");
+            Optional<Credentials> optionalCredential = entityManager
+                    .createQuery(query, Credentials.class)
+                    .setParameter(1, userCredential).getResultList().stream().findFirst();
+            if (optionalCredential.isPresent()) {
+                input.getEmptyInput("User with given " + credentialType + " already exists." +
+                        "Provide different credentials.");
+            } else {
+                validCredentials = true;
+            }
+        }
+        return userCredential;
     }
 }

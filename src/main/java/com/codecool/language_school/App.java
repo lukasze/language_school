@@ -26,7 +26,18 @@ public class App {
      */
     public static void main(String[] args) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("language_school");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.clear(); //clear hibernate cache - force next statements to read data from db
+
+        DataGenerator dataGenerator = new DataGenerator(entityManager);
+        dataGenerator.populateDb();
+
+        AppControl appControl = new AppControl(entityManager);
+        appControl.run();
+
+        entityManager.close();
+        entityManagerFactory.close();
 
     }
 }
