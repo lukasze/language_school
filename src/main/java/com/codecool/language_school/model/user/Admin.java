@@ -3,7 +3,8 @@ package com.codecool.language_school.model.user;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-//@Annotation
+@Entity
+@DiscriminatorValue(value= Role.Values.ADMIN_STRING)
 public class Admin extends User {
 
     public Admin() {

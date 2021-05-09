@@ -2,19 +2,20 @@ package com.codecool.language_school.model.user;
 
 import javax.persistence.*;
 
-//@Annotation
+@Entity
 public class Credentials {
 
-    //@Annotation
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //@Annotation
+    @Column(nullable = false, unique = true)
     private String email;
 
-    //@Annotation
+    @Column(nullable = false, unique = true)
     private String login;
 
-    //@Annotation
+    @Column(nullable = false)
     private String password;
 
     public Credentials(String email, String login, String password) {

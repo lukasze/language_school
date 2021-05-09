@@ -6,13 +6,17 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 
-//@Annotation
+@Entity
+@DiscriminatorValue(value= Role.Values.STUDENT_STRING)
 public class Student extends User {
 
-    //@Annotation
+    @ManyToOne
+    @NotNull
+    @JoinTable(name="student_klass", joinColumns = @JoinColumn(name = "student_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "klass_id", referencedColumnName = "id"))
     private Klass klass;
 
-    //@Annotation
+    @OneToOne(mappedBy = "student")
     private Attendance attendance;
 
     public Student(Klass klass) {

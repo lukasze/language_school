@@ -5,19 +5,24 @@ import com.sun.istack.NotNull;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-//@Annotation
+@Entity
 public class AttendanceEntry {
 
-    //@Annotation
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //@Annotation
+    @Basic
+    @NotNull
     private LocalDate date;
 
-    //@Annotation
+    @Enumerated(EnumType.STRING)
+    @NotNull
     private AttendanceStatus status;
 
-    //@Annotation
+    @ManyToOne
+    @JoinTable(name="attendence_attendenceentry", joinColumns = @JoinColumn(name = "attendence_entry_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "attendence_id", referencedColumnName = "id"))
     private Attendance attendance;
 
     public AttendanceEntry(LocalDate date, AttendanceStatus status) {

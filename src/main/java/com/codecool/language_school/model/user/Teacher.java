@@ -6,10 +6,11 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-//@Annotation
+@Entity
+@DiscriminatorValue(value= Role.Values.TEACHER_STRING)
 public class Teacher extends User {
 
-    //@Annotation
+    @OneToMany(mappedBy = "teacher")
     private final Set<Klass> classesAssigned;
 
     public Teacher() {

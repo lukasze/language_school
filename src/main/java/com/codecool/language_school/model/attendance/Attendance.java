@@ -7,16 +7,18 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-//@Annotation
+@Entity
 public class Attendance {
 
-    //@Annotation
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //@Annotation
+    @OneToMany(mappedBy = "attendance")
     private Set<AttendanceEntry> attendanceHistory;
 
-    //@Annotation
+    @OneToOne
+    @NotNull
     private Student student;
 
     public Attendance(Student student) {

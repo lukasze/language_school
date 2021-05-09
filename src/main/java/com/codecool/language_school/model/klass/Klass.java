@@ -7,19 +7,22 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-//@Annotation
+@Entity
 public class Klass {
 
-    //@Annotation
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //@Annotation
+    @Basic
     private String className;
 
-    //@Annotation
+    @OneToMany(mappedBy = "klass")
     private Set<Student> studentSet;
 
-    //@Annotation
+    @ManyToOne
+    @JoinTable(name="teacher_klass", joinColumns = @JoinColumn(name = "klass_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "teacher_id", referencedColumnName = "id"))
     private Teacher teacher;
 
     public Klass(String className) {
