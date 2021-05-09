@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+
+    <!--    FIX PERSISTENCE UNIT-->
+    <persistence-unit name="FIX_ME!" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>com.codecool.language_school.model.attendance.Attendance</class>
+        <class>com.codecool.language_school.model.attendance.AttendanceEntry</class>
+        <class>com.codecool.language_school.model.attendance.AttendanceStatus</class>
+        <class>com.codecool.language_school.model.klass.Klass</class>
+        <class>com.codecool.language_school.model.user.Credentials</class>
+        <class>com.codecool.language_school.model.user.Role</class>
+        <class>com.codecool.language_school.model.user.Student</class>
+        <class>com.codecool.language_school.model.user.Teacher</class>
+        <class>com.codecool.language_school.model.user.Admin</class>
+
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect"/>
+            <property name="hibernate.hbm2dll.auto" value="create-drop"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+
+            <!--            UNCOMMENT TO CREATE FILE WITH COMMANDS-->
+            <!--            <property name="javax.persistence.schema-generation.scripts.action" value="drop-and-create"/>-->
+            <!--            <property name="javax.persistence.schema-generation.scripts.create-target" value="src/main/resources/META-INF/create-schema.ddl"/>-->
+            <!--            <property name="javax.persistence.schema-generation.scripts.drop-target" value="src/main/resources/META-INF/drop-schema.ddl"/>-->
+            <!--            <property name="javax.persistence.sql-load-script-source" value="insert.sql"/>-->
+
+
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/language_school"/>
+
+            <!--            PROVIDE CREDENTIALS FOR YOUR DATABASE-->
+            <property name="javax.persistence.jdbc.user" value="FIX_ME!"/>
+            <property name="javax.persistence.jdbc.password" value="FIX_ME!"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>
