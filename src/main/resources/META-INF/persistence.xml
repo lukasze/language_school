@@ -5,7 +5,7 @@
              version="2.1">
 
     <!--    FIX PERSISTENCE UNIT-->
-    <persistence-unit name="FIX_ME!" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="language_school" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.codecool.language_school.model.attendance.Attendance</class>
         <class>com.codecool.language_school.model.attendance.AttendanceEntry</class>
@@ -36,8 +36,8 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/language_school"/>
 
             <!--            PROVIDE CREDENTIALS FOR YOUR DATABASE-->
-            <property name="javax.persistence.jdbc.user" value="FIX_ME!"/>
-            <property name="javax.persistence.jdbc.password" value="FIX_ME!"/>
+            <property name="javax.persistence.jdbc.user" value="school_admin"/>
+            <property name="javax.persistence.jdbc.password" value="1234"/>
         </properties>
     </persistence-unit>
 
